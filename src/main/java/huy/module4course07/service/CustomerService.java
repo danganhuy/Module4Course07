@@ -4,6 +4,8 @@ import huy.module4course07.model.Customer;
 import huy.module4course07.model.Province;
 import huy.module4course07.repository.ICustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -34,7 +36,17 @@ public class CustomerService implements ICustomerService {
     }
 
     @Override
+    public Page<Customer> findAll(Pageable pageable) {
+        return customerRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<Customer> findAllByFirstNameContaining(Pageable pageable, String name) {
+        return customerRepository.findAllByFirstNameContaining(pageable, name);
+    }
+
+    @Override
     public Iterable<Customer> findAllByProvince(Province province) {
-        return null;
+        return customerRepository.findAllByProvince(province);
     }
 }

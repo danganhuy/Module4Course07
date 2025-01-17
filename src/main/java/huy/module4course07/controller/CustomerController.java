@@ -5,6 +5,9 @@ import huy.module4course07.model.Province;
 import huy.module4course07.service.ICustomerService;
 import huy.module4course07.service.IProvinceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -26,10 +29,25 @@ public class CustomerController {
         return provinceService.findAll();
     }
 
-    @GetMapping
-    public ModelAndView listCustomer() {
+    @GetMapping("")
+    public ModelAndView listCustomers(@RequestParam(value = "page", defaultValue = "0") int page){
+        Pageable pageable = PageRequest.of(page, 5);
+        Page<Customer> customers = customerService.findAll(pageable);
         ModelAndView modelAndView = new ModelAndView("/customer/list");
-        Iterable<Customer> customers = customerService.findAll();
+        modelAndView.addObject("customers", customers);
+        return modelAndView;
+    }
+
+    @GetMapping("/search")
+    public ModelAndView listCustomers(@RequestParam("search") Optional<String> search, @RequestParam(value = "page", defaultValue = "0") int page){
+        Pageable pageable = PageRequest.of(page, 5);
+        Page<Customer> customers;
+        if(search.isPresent()){
+            customers = customerService.findAllByFirstNameContaining(pageable, search.get());
+        } else {
+            customers = customerService.findAll(pageable);
+        }
+        ModelAndView modelAndView = new ModelAndView("/customer/list");
         modelAndView.addObject("customers", customers);
         return modelAndView;
     }
